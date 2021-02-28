@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "~/.pyenv/version/dbmisvc-stack/bin/python",
+    "git.ignoreLimitWarning": true
+}

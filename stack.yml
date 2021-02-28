@@ -1,0 +1,44 @@
+stack:
+
+  # The identifier of the stack
+  name: ppm
+
+  # The directory where all cloned repos should be placed
+  apps-directory: 'apps'
+
+  # Specify the container running databases
+  database-container:
+
+    # The name of the container
+    name: stackdb
+
+    # The type of database (mysql, mariadb or postgres)
+    database: mysql
+
+  # Additional configuration parameters for the apps live here
+  apps:
+    app:
+      # The repo URL
+      repository: https://github.com/organization/app.git
+
+      # The particular branch to checkout, if other than master
+      branch: development
+
+      # Set the name of the database for automated DB operations
+      database: app
+
+      packages:
+        - package
+
+  # Secrets configuration go here
+  secrets:
+    region: us-east-1
+    profile: default
+    name: aws/secrets/manager/name
+
+  # Packages applications depend on can go here
+  index: http://localhost:3141/root/public/+simple/
+  packages:
+    - name: package
+      path: /home/src/package
+      build: python setup.py sdist bdist_wheel

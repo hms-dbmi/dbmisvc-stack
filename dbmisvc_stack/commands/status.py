@@ -1,0 +1,34 @@
+"""The status command."""
+
+import docker
+
+from dbmisvc_stack.commands.base import Base
+from dbmisvc_stack.app import App
+
+import logging
+
+logger = logging.getLogger("stack")
+
+
+class Status(Base):
+    def run(self):
+
+        # Get the docker client.
+        docker_client = docker.from_env()
+
+        # Get the app.
+        app = self.options["<app>"]
+        if app is not None:
+
+            # Check run status
+            logger.info(
+                "({}) Status: {}".format(app, App.get_status(docker_client, app))
+            )
+
+        else:
+
+            # Get all app statuses
+            for app in App.get_apps():
+                logger.info(
+                    "({}) Status: {}".format(app, App.get_status(docker_client, app))
+                )
