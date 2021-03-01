@@ -7,7 +7,7 @@
             "changelogFile": "CHANGELOG.md"
         }],
         ["@semantic-release/exec", {
-          "prepareCmd": "sed -ie \"s/^__version__.*/__version__ = \\x22${nextRelease.version}\\x22/g\"dbmisvc_stack/__init__.py && python setup.py sdist bdist_wheel"
+          "prepareCmd": "sed -ie \"s/^__version__.*/__version__ = \\x22${nextRelease.version}\\x22/g\" dbmisvc_stack/__init__.py && python setup.py sdist bdist_wheel"
         }],
         ["@semantic-release/git", {
             "assets": [dbmisvc_stack/__init__.py", "CHANGELOG.md"],

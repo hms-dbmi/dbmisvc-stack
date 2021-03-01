@@ -5,20 +5,14 @@ from datetime import datetime
 
 year = datetime.now().strftime("%Y")
 
-__title__ = "DBMISVC Stack"
-__description = (
-    "A command line program to facilitate development "
-    "on a stack of containerized services"
-)
+__title__ = "dbmisvc-stack"
+__description = "A command line program to facilitate development " "on a stack of containerized services"
 __version__ = "0.1.0"
 __url__ = "https://github.com/hms-dbmi/dbmisvc-stack.git"
 __author__ = "HMS DBMI Technology Core"
 __author_email__ = "bryan_larson@hms.harvard.edu"
 __license__ = "BSD 2-Clause"
-__copyright__ = (
-    "Copyright 2011-{} Harvard Medical School"
-    " Department of Biomedical Informatics".format(year)
-)
+__copyright__ = "Copyright 2011-{} Harvard Medical School" " Department of Biomedical Informatics".format(year)
 
 # Version synonym
 VERSION = __version__
