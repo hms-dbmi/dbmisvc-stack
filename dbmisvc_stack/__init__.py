@@ -7,7 +7,7 @@ year = datetime.now().strftime("%Y")
 
 __title__ = "dbmisvc-stack"
 __description = "A command line program to facilitate development " "on a stack of containerized services"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __url__ = "https://github.com/hms-dbmi/dbmisvc-stack.git"
 __author__ = "HMS DBMI Technology Core"
 __author_email__ = "bryan_larson@hms.harvard.edu"
