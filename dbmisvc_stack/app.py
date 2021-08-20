@@ -56,15 +56,13 @@ class Stack:
         valid = True
 
         # Check for required docker-compose file
-        if not os.path.exists(
-            os.path.join(cwd, "docker-compose.yml")
-        ) and not os.path.exists(os.path.join(cwd, "docker-compose.yaml")):
+        if not os.path.exists(os.path.join(cwd, "docker-compose.yml")) and not os.path.exists(
+            os.path.join(cwd, "docker-compose.yaml")
+        ):
             logger.critical("ERROR: docker-compose.yml is missing!")
             valid = False
 
-        if not os.path.exists(os.path.join(cwd, "stack.yaml")) and not os.path.exists(
-            os.path.join(cwd, "stack.yml")
-        ):
+        if not os.path.exists(os.path.join(cwd, "stack.yaml")) and not os.path.exists(os.path.join(cwd, "stack.yml")):
             logger.critical("ERROR: stack.yml is missing!")
             valid = False
 
@@ -178,9 +176,7 @@ class Stack:
         and logs stdout messages via logger.debug and stderr messages via
         logger.error.
         """
-        child = subprocess.Popen(
-            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs
-        )
+        child = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
 
         # Docker-compose uses stderr for console output
         log_level = {child.stdout: INFO, child.stderr: DEBUG}
@@ -219,9 +215,7 @@ class Stack:
             database = Stack.get_config("database-container")["database"]
             container = Stack.get_config("database-container")["name"]
             if database not in databases:
-                raise NotImplementedError(
-                    "Database '{}' is not supported".format(database)
-                )
+                raise NotImplementedError("Database '{}' is not supported".format(database))
 
             return database, container
 
@@ -230,9 +224,7 @@ class Stack:
 
             # Determine which app provides the database
             for container in App.get_apps():
-                if App.get_config(container, "image") and database in App.get_config(
-                    container, "image"
-                ):
+                if App.get_config(container, "image") and database in App.get_config(container, "image"):
                     return database, container
 
     @staticmethod
@@ -294,16 +286,10 @@ class Stack:
 
         # Check result
         if exit_code:
-            logger.error(
-                "({}) Purge operation to drop database failed: {} - {}".format(
-                    container, exit_code, output
-                )
-            )
+            logger.error("({}) Purge operation to drop database failed: {} - {}".format(container, exit_code, output))
             return False
         else:
-            logger.debug(
-                "({}) Drop database: {} - {}".format(container, exit_code, output)
-            )
+            logger.debug("({}) Drop database: {} - {}".format(container, exit_code, output))
 
         # Build the command to create empty database and run it
         command = "mysqladmin -u{} -p{} create {}".format(username, password, database)
@@ -311,16 +297,10 @@ class Stack:
 
         # Check result
         if exit_code:
-            logger.error(
-                "({}) Purge operation to create database failed: {} - {}".format(
-                    container, exit_code, output
-                )
-            )
+            logger.error("({}) Purge operation to create database failed: {} - {}".format(container, exit_code, output))
             return False
         else:
-            logger.debug(
-                "({}) Create database: {} - {}".format(container, exit_code, output)
-            )
+            logger.debug("({}) Create database: {} - {}".format(container, exit_code, output))
 
         # Build the command to flush privileges and run it
         command = "mysqladmin -u{} -p{} flush-privileges".format(username, password)
@@ -329,15 +309,11 @@ class Stack:
         # Check result
         if exit_code:
             logger.error(
-                "({}) Purge operation to flush privileges failed: {} - {}".format(
-                    container, exit_code, output
-                )
+                "({}) Purge operation to flush privileges failed: {} - {}".format(container, exit_code, output)
             )
             return False
         else:
-            logger.debug(
-                "({}) Flush privileges: {} - {}".format(container, exit_code, output)
-            )
+            logger.debug("({}) Flush privileges: {} - {}".format(container, exit_code, output))
 
         return True
 
@@ -430,17 +406,12 @@ class App:
 
             container = docker_client.containers.get(name)
 
-            logger.info(
-                "({}) Container found with status '{}'".format(app, container.status)
-            )
+            logger.info("({}) Container found with status '{}'".format(app, container.status))
 
             return container.status == "running"
 
         except docker_errors.NotFound:
-            logger.warning(
-                "({}) Container is not running, ensure all containers"
-                " are running".format(app)
-            )
+            logger.warning("({}) Container is not running, ensure all containers" " are running".format(app))
 
         return False
 
@@ -471,16 +442,12 @@ class App:
                     Stack.hook("post-clean")
 
                     # Log.
-                    logger.debug(
-                        "({}) Docker images cleaned successfully".format(app_to_clean)
-                    )
+                    logger.debug("({}) Docker images cleaned successfully".format(app_to_clean))
 
             else:
 
                 # Log.
-                logger.debug(
-                    "({}) Not a built app, no need to clean images".format(app_to_clean)
-                )
+                logger.debug("({}) Not a built app, no need to clean images".format(app_to_clean))
 
     @staticmethod
     def check_docker_images(docker_client, app, external=False):
@@ -488,40 +455,34 @@ class App:
         # Check the testing image.
         image = App.get_image_name(app)
 
+        # Ensure we have an image to clean
+        if not image:
+            logger.warning(f"({app}) Does not have an image name specified!")
+            return False
+
         # Ensure it exists locally.
         try:
-            logger.debug(
-                "({}) Looking for docker image '{}' locally".format(app, image)
-            )
+            logger.debug("({}) Looking for docker image '{}' locally".format(app, image))
             docker_client.images.get(image)
             return True
 
         except docker_errors.ImageNotFound:
 
             if not external:
-                logger.warning(
-                    "({}) Docker image '{}' not found, will need to build...".format(
-                        app, image
-                    )
-                )
+                logger.warning("({}) Docker image '{}' not found, will need to build...".format(app, image))
                 return False
 
             else:
                 # Try to find it externally
                 try:
-                    logger.debug(
-                        "({}) Looking for docker image '{}' in the Docker"
-                        " registry".format(app, image)
-                    )
+                    logger.debug("({}) Looking for docker image '{}' in the Docker" " registry".format(app, image))
                     images = docker_client.images.search(image)
                     for remote_image in images:
                         if remote_image["name"] == image:
                             return True
 
                 except (docker_errors.ImageNotFound or docker_errors.APIError):
-                    logger.warning(
-                        "({}) Docker image '{}' not found anywhere".format(app, image)
-                    )
+                    logger.warning("({}) Docker image '{}' not found anywhere".format(app, image))
                     pass
 
         return False
@@ -539,17 +500,11 @@ class App:
 
         # Set flags to check the context.
         if not os.path.exists(path):
-            logger.error(
-                "({}) The build directory '{}' does not exist".format(app, path)
-            )
+            logger.error("({}) The build directory '{}' does not exist".format(app, path))
             return False
 
         if not os.path.exists(os.path.join(context_dir, "Dockerfile")):
-            logger.error(
-                "({}) The build directory '{}' does not contain a Dockerfile".format(
-                    app, path
-                )
-            )
+            logger.error("({}) The build directory '{}' does not contain a Dockerfile".format(app, path))
             return False
 
         # Get volumes
@@ -562,25 +517,16 @@ class App:
 
                 # Ignore volumes without a host section
                 if len(segments) == 1:
-                    logger.info(
-                        "({}) Volume '{}' is not host-mounted".format(app, volume)
-                    )
+                    logger.info("({}) Volume '{}' is not host-mounted".format(app, volume))
 
                 elif "/" not in segments[0]:
-                    logger.info(
-                        "({}) Volume '{}' is a named volume".format(app, volume)
-                    )
+                    logger.info("({}) Volume '{}' is a named volume".format(app, volume))
 
                 else:
                     # See if it exists.
-                    path = os.path.normpath(
-                        os.path.join(Stack.get_stack_root(), segments[0])
-                    )
+                    path = os.path.normpath(os.path.join(Stack.get_stack_root(), segments[0]))
                     if not os.path.exists(path):
-                        logger.error(
-                            "({}) Volume '{}' does not exist, ensure paths"
-                            " are correct".format(app, path)
-                        )
+                        logger.error("({}) Volume '{}' does not exist, ensure paths" " are correct".format(app, path))
                         valid = False
 
         return valid
@@ -688,9 +634,7 @@ class App:
 
                 return link
             else:
-                logger.error(
-                    "({}) Could not find value for pattern '{}'".format(app, regex)
-                )
+                logger.error("({}) Could not find value for pattern '{}'".format(app, regex))
 
                 return None
         except Exception as e:
@@ -709,9 +653,7 @@ class App:
             return container.exec_run(cmd)
 
         except docker_errors.NotFound:
-            logger.error(
-                "({}) Container could not be found for running command".format(app)
-            )
+            logger.error("({}) Container could not be found for running command".format(app))
         except docker_errors.APIError as e:
             logger.exception("({}) Error while running command: {}".format(app, e))
 
@@ -725,9 +667,7 @@ class App:
 
         # Skip if not container name is specified.
         if not name:
-            logger.debug(
-                "({}) Skipping app status check, no container name...".format(app)
-            )
+            logger.debug("({}) Skipping app status check, no container name...".format(app))
             return "N/A"
 
         # Fetch it.
@@ -757,10 +697,7 @@ class App:
 
         # Ensure valid values.
         if repo_url is None or repo_branch is None:
-            logger.error(
-                "({}) Repository URL or branch is not specified,"
-                " cannot initialize...".format(app)
-            )
+            logger.error("({}) Repository URL or branch is not specified," " cannot initialize...".format(app))
             return
 
         # Determine the path to the app directory
@@ -778,9 +715,7 @@ class App:
                     "git",
                     "commit",
                     "-m",
-                    '"Stack op: Removing subtree {} for cloning branch {}"'.format(
-                        app, repo_branch
-                    ),
+                    '"Stack op: Removing subtree {} for cloning branch {}"'.format(app, repo_branch),
                 ]
             )
 
@@ -808,9 +743,7 @@ class App:
             logger.debug("({}) App was initialized successfully!".format(app))
 
         else:
-            logger.critical(
-                "({}) Something happened to the init process...".format(app)
-            )
+            logger.critical("({}) Something happened to the init process...".format(app))
 
     @staticmethod
     def get_external_port(app, internal_port):
@@ -838,9 +771,7 @@ class App:
         # Check for defined database
         database_name = App.get_app_stack_config(app, "database")
         if not database_name:
-            logger.error(
-                f"App {app} does not have 'database' defined in stack, cannot proceed"
-            )
+            logger.error(f"App {app} does not have 'database' defined in stack, cannot proceed")
             return
         else:
             logger.debug("({}) Will purge database '{}'".format(app, database_name))
@@ -857,9 +788,7 @@ class App:
 
         # Drop the database.
         logger.warning(
-            "({}) Preparing to purge database '{}' from '{}' ({})".format(
-                app, database_name, container, database
-            )
+            "({}) Preparing to purge database '{}' from '{}' ({})".format(app, database_name, container, database)
         )
 
         # Run it
